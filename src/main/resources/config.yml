@@ -1,0 +1,156 @@
+###
+# Dynmap Marker Extension
+# add structure markers into Dynmap .
+# 2023+ furplag@github
+###
+
+###
+# general configuration
+# enabled: whether available this plugin or not ( default: true )
+# debug-enabled: enable to logging more details ( default: false )
+# worlds: world name(s) that allowed marking structures into the map, 
+#         empty means "All maps accepts to mark structures"
+# marker-prefix: used to detect the Markers this plugin made ( default: "structure-marker" )
+# marker-icon-prefix: used to detect the Marker Icons this plugin made ( default: "structure-marker" )
+# marker-set-prefix: used to detect the Marker Sets this plugin made ( default: "structure-marker" )
+###
+# enabled: true
+# debug-enabled: false
+# worlds:
+# - world
+# - world_nether
+# - world_the_end
+# marker-prefix: structure-marker
+# marker-icon-prefix: structure-marker
+# marker-set-prefix: structure-marker
+
+###
+# Marker Icon configuration
+# Structure Name: structure ID via org.bukkit.generator.structure.Structure
+#   icon: override icon image if you need, set file name path to {plugin folder}
+#   label: using structure ID formatted with typical Letter-case if unspecified
+###
+marker-icons:
+  _unresolved: # use by dafault, if missing the structure
+    label: Unknown Structure
+  desert_pyramid:
+    label: Pyramid
+  jungle_pyramid:
+    label: Jungle Temple
+  mansion:
+    label: Woodland Mansion
+  mineshaft_mesa:
+    label: Mineshaft
+  monument:
+    label: Ocean Monument
+  ocean_ruin_cold:
+    label: Ocean Ruin
+  ocean_ruin_warm:
+    label: Ocean Ruin
+  portal: # unable to add marker automatically because Structure.PORTAL is not implement.
+    label: Nether Portal
+  ruined_portal_desert:
+    label: Ruined Portal
+  ruined_portal_jungle:
+    label: Ruined Portal
+  ruined_portal_mountain:
+    label: Ruined Portal
+  ruined_portal_nether:
+    label: Ruined Portal
+  ruined_portal_ocean:
+    label: Ruined Portal
+  ruined_portal_swamp:
+    label: Ruined Portal
+  shipwreck_beached:
+    label: Shipwreck
+  village_desert:
+    label: Desert Village
+  village_jungle: # unable to add marker automatically because Structure.VILLAGE_JUNGLE is not implement yet.
+    label: Jungle Village
+  village_plains:
+    label: Plains Village
+  village_savanna:
+    label: Savanna Village
+  village_swamp: # unable to add marker automatically because Structure.VILLAGE_SWAMP is not implement yet.
+    label: Swamp Village
+  village_snowy:
+    label: Snowy Village
+  village_taiga:
+    label: Taiga Village
+
+###
+# Marker Set ( layer ) configuration
+# Marker Set Name: Marker Set ID
+#   hide-by-default: if true, layer for set will be hidden by default ( default: false )
+#   min-zoom: zoom level of marker set (default: -1 (unlimited) )
+#   max-zoom: zoom level of marker set (default: -1 (unlimited) )
+#   priority: layer ordering priority (default: 10, low before high in layer order)
+#   label: using Marker Set ID formatted with typical Letter-case if unspecified
+#   icon: override icon image if you need, set file name path to {plugin folder}
+#   label-show: if true, show labels; if false, hide (show on hover) ( default: false )
+#   label-with-coordinates: append location "[ X, Z ]" into marker label, if true ( default: true )
+#   structures: keys of Structure ( and also StructureType ) to generate into this map layer.
+#               empty means "generate all structure markers into the marker set"
+###
+marker-sets:
+# _default:
+#   hide-by-default: true
+#   min-zoom: 0
+#   max-zoom: 2
+#   priority: 100
+#   label: Structures
+#   icon: _unresolved
+#   label-show: true
+#   label-with-coordinates: true
+  dungeons:
+    priority: 12
+    structures:
+    - ancient_city
+    - bastion_remnant
+    - end_city
+    - fortress
+    - mansion
+    - mineshaft
+    - mineshaft_mesa
+    - monument
+    - pillager_outpost
+    - stronghold
+    - trial_chambers
+  portals:
+    priority: 13
+    structures:
+    - portal
+    - ruined_portal
+    - ruined_portal_desert
+    - ruined_portal_jungle
+    - ruined_portal_mountain
+    - ruined_portal_nether
+    - ruined_portal_ocean
+    - ruined_portal_swamp
+  ruins:
+    priority: 11
+    structures:
+    - desert_pyramid
+    - jungle_pyramid
+    - ocean_ruin_cold
+    - ocean_ruin_warm
+    - trail_ruins
+  treasure_map:
+    hide-by-default: true
+    priority: 20
+    structures:
+    - buried_treasure
+    - shipwreck
+    - shipwreck_beached
+  villages:
+    structures:
+    - igloo
+    - swamp_hut
+    - village
+    - village_desert
+    - village_jungle
+    - village_plains
+    - village_savanna
+    - village_snowy
+    - village_swamp
+    - village_taiga
