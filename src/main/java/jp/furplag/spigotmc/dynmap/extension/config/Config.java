@@ -40,7 +40,7 @@ import lombok.ToString;
 
 /**
  * plugin configuration .
- * 
+ *
  * @author furplag
  *
  */
@@ -64,7 +64,7 @@ public interface Config extends ConfigurationSerializable {
     }
 
     private static final String _join(final String delimiter, final Object... args) {
-      return Arrays.stream(Optional.ofNullable(args).orElse(new Object[] {})).map((arg) -> Objects.toString(arg, null)).filter(Objects::nonNull).collect(Collectors.joining(StringUtils.defaultIfBlank(delimiter, "")));  
+      return Arrays.stream(Optional.ofNullable(args).orElse(new Object[] {})).map((arg) -> Objects.toString(arg, null)).filter(Objects::nonNull).collect(Collectors.joining(StringUtils.defaultIfBlank(delimiter, "")));
     }
 
     /** whether available this plugin or not ( default: true ) */
@@ -74,7 +74,7 @@ public interface Config extends ConfigurationSerializable {
     private final boolean debugEnabled;
 
     /**
-     * world name(s) that allowed marking structures into the map, 
+     * world name(s) that allowed marking structures into the map,
      * empty means "All maps accepts to mark structures"
      */
     private final Set<String> worlds = new HashSet<>();
@@ -105,7 +105,7 @@ public interface Config extends ConfigurationSerializable {
       private final @Nonnull String id;
 
       /**
-       * <p>the name use to display marker into the map .</p> 
+       * <p>the name use to display marker into the map .</p>
        * using {@link #id} formatted with typical Letter-case ( space separated ) by defaults .
        */
       private final String label;
@@ -115,7 +115,7 @@ public interface Config extends ConfigurationSerializable {
        * <ol>
        * <li>put image into {@link org.bukkit.plugin.Plugin#getDataFolder() Plugin Folder} .</li>
        * <li>set the image path of under {@link org.bukkit.plugin.Plugin#getDataFolder() Plugin Folder} .</li>
-       * </ol> 
+       * </ol>
        */
       private final String icon;
 
@@ -135,7 +135,7 @@ public interface Config extends ConfigurationSerializable {
 
       /**
        * returns a image of marker icon .
-       * 
+       *
        * @return a stream of image
        */
       public InputStream getIconImage() {
@@ -159,7 +159,7 @@ public interface Config extends ConfigurationSerializable {
       private final @Nonnull String id;
 
       /**
-       * <p>the name use to display marker layer toggles .</p> 
+       * <p>the name use to display marker layer toggles .</p>
        * using {@link #id} formatted with typical Letter-case ( space separated ) by defaults .
        */
       private final String label;
@@ -192,7 +192,7 @@ public interface Config extends ConfigurationSerializable {
       private final Set<String> structures = new HashSet<>();
 
       private static final List<MarkerSetConfig> deserialize(final ConfigurationSection config) {
-        
+
         return Trebuchet.Functions.orElse(config, (_config) -> _config.getConfigurationSection("marker-sets").getValues(false), (t, ex) -> {ex.printStackTrace(); return new HashMap<String, Object>();})
             .keySet().stream().map((k) -> Map.entry(k, config.getConfigurationSection(_join(".", "marker-sets", k)))).map((e) -> deserialize(e.getKey(), e.getValue()))
             .filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());

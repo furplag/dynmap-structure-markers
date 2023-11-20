@@ -34,7 +34,7 @@ import lombok.Getter;
 
 /**
  * Spigot plugin to generate structure markers into Dynmap automatically
- * 
+ *
  * @author furplag
  *
  */
@@ -76,7 +76,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       saveDefaultConfig();
       getConfig().options().copyDefaults(true);
       config = StructureMarkersConfig.deserialize(getConfig());
-      
+
       if (config.isDebugEnabled()) {
         getLogger().setLevel(java.util.logging.Level.ALL);
         SavageReflection.set(log, "debugEnabled", true);
@@ -85,14 +85,14 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       return Trebuchet.Predicates.orNot(config, (_config) -> _config.isEnabled());
     }, (t, ex) -> {
       ex.printStackTrace();
-      
+
       return false;
     });
   }
 
   /**
    * register ( or update ) marker icon(s) .
-   * 
+   *
    * @param dynmap {@link DynmapCommonAPI}
    * @return the result of registration
    */
@@ -108,12 +108,12 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       });
 
       return config.getMarkerIcons().size() == config.getMarkerIcons().parallelStream().map(config::getMarkerIconId).map(markerAPI::getMarkerIcon).filter(Objects::nonNull).count();
-    });    
+    });
   }
 
   /**
    * register ( or update ) marker set(s) .
-   * 
+   *
    * @param dynmap {@link DynmapCommonAPI}
    * @return the result of registration
    */
@@ -135,7 +135,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       });
 
       return config.getMarkerSets().size() == config.getMarkerSets().parallelStream().map(config::getMarkerSetId).map(markerAPI::getMarkerSet).filter(Objects::nonNull).count();
-    });    
+    });
   }
 
   private void registerMarker(final ChunkLoadEvent event) {
@@ -172,12 +172,12 @@ public class StructureMarkers extends JavaPlugin implements Listener {
           });
         }));
       });
-    });    
+    });
   }
 
   /**
    * remove marker icon(s) registered by this plugin .
-   * 
+   *
    * @param dynmap {@link DynmapCommonAPI}
    * @return false if error(s) occured
    */
@@ -188,12 +188,12 @@ public class StructureMarkers extends JavaPlugin implements Listener {
         .peek((markerIcon) -> log.debug("removing marker icon: \"{}\" .", markerIcon.getMarkerIconID())).forEach(MarkerIcon::deleteIcon);
 
       return true;
-    });    
+    });
   }
 
   /**
    * remove marker set(s) registered by this plugin .
-   * 
+   *
    * @param dynmap {@link DynmapCommonAPI}
    * @return false if error(s) occured
    */
@@ -204,7 +204,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
         .peek((markerSet) -> log.debug("removing marker set: \"{}\" .", markerSet.getMarkerSetID())).forEach(MarkerSet::deleteMarkerSet);
 
       return true;
-    });    
+    });
   }
 
   /** {@inheritDoc} */ @Override public void onDisable() {
@@ -229,7 +229,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       ex.printStackTrace();
       getServer().getPluginManager().disablePlugin(this);
     }), () -> {
-      // missing Dynmap plugin or disabled . 
+      // missing Dynmap plugin or disabled .
       Bukkit.getServer().getConsoleSender().sendMessage("%sDynmap plugin unavailable .".formatted(ChatColor.RED.toString()));
       getServer().getPluginManager().disablePlugin(this);
     });
