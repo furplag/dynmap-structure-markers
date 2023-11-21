@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ import lombok.ToString;
 
 /**
  * plugin configuration .
- * 
+ *
  * @author furplag
  *
  */
@@ -64,7 +65,7 @@ public interface Config extends ConfigurationSerializable {
     }
 
     private static final String _join(final String delimiter, final Object... args) {
-      return Arrays.stream(Optional.ofNullable(args).orElse(new Object[] {})).map((arg) -> Objects.toString(arg, null)).filter(Objects::nonNull).collect(Collectors.joining(StringUtils.defaultIfBlank(delimiter, "")));  
+      return Arrays.stream(Optional.ofNullable(args).orElse(new Object[] {})).map((arg) -> Objects.toString(arg, null)).filter(Objects::nonNull).collect(Collectors.joining(StringUtils.defaultIfBlank(delimiter, "")));
     }
 
     /** whether available this plugin or not ( default: true ) */
@@ -74,7 +75,7 @@ public interface Config extends ConfigurationSerializable {
     private final boolean debugEnabled;
 
     /**
-     * world name(s) that allowed marking structures into the map, 
+     * world name(s) that allowed marking structures into the map,
      * empty means "All maps accepts to mark structures"
      */
     private final Set<String> worlds = new HashSet<>();
@@ -105,7 +106,7 @@ public interface Config extends ConfigurationSerializable {
       private final @Nonnull String id;
 
       /**
-       * <p>the name use to display marker into the map .</p> 
+       * <p>the name use to display marker into the map .</p>
        * using {@link #id} formatted with typical Letter-case ( space separated ) by defaults .
        */
       private final String label;
@@ -115,7 +116,7 @@ public interface Config extends ConfigurationSerializable {
        * <ol>
        * <li>put image into {@link org.bukkit.plugin.Plugin#getDataFolder() Plugin Folder} .</li>
        * <li>set the image path of under {@link org.bukkit.plugin.Plugin#getDataFolder() Plugin Folder} .</li>
-       * </ol> 
+       * </ol>
        */
       private final String icon;
 
@@ -135,11 +136,15 @@ public interface Config extends ConfigurationSerializable {
 
       /**
        * returns a image of marker icon .
-       * 
+       *
        * @return a stream of image
        */
       public InputStream getIconImage() {
         return Objects.requireNonNullElse(StringUtils.isBlank(icon) ? getClass().getResourceAsStream("/icons/%s.png".formatted(id)) : Trebuchet.Functions.orNot(Bukkit.getPluginManager().getPlugin(pluginName).getDataFolder().toPath().resolve(icon), Files::newInputStream), StructureMarkersConfig.class.getResourceAsStream("/icons/_default.png".formatted(id)));
+      }
+
+      /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
+        return Config.super.serialize().entrySet().stream().filter((e) -> !"id".equals(e.getKey())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
       }
     }
     private final List<MarkerIconConfig> markerIcons = new ArrayList<>();
@@ -159,7 +164,7 @@ public interface Config extends ConfigurationSerializable {
       private final @Nonnull String id;
 
       /**
-       * <p>the name use to display marker layer toggles .</p> 
+       * <p>the name use to display marker layer toggles .</p>
        * using {@link #id} formatted with typical Letter-case ( space separated ) by defaults .
        */
       private final String label;
@@ -192,7 +197,7 @@ public interface Config extends ConfigurationSerializable {
       private final Set<String> structures = new HashSet<>();
 
       private static final List<MarkerSetConfig> deserialize(final ConfigurationSection config) {
-        
+
         return Trebuchet.Functions.orElse(config, (_config) -> _config.getConfigurationSection("marker-sets").getValues(false), (t, ex) -> {ex.printStackTrace(); return new HashMap<String, Object>();})
             .keySet().stream().map((k) -> Map.entry(k, config.getConfigurationSection(_join(".", "marker-sets", k)))).map((e) -> deserialize(e.getKey(), e.getValue()))
             .filter(Objects::nonNull).collect(Collectors.toUnmodifiableList());
@@ -217,6 +222,10 @@ public interface Config extends ConfigurationSerializable {
 
       public boolean isRender(final Structure structure) {
         return structures.isEmpty() || structures.contains(structure.getKey().getKey());
+      }
+
+      /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
+        return Config.super.serialize().entrySet().stream().filter((e) -> !"id".equals(e.getKey())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
       }
     }
     private final List<MarkerSetConfig> markerSets = new ArrayList<>();
@@ -246,7 +255,15 @@ public interface Config extends ConfigurationSerializable {
     }
 
     /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
-      return SavageReflection.read(this);
+      return _serialize(this).map((entry) -> {
+        if ("markerIcons".equals(entry.getKey())) {
+          return Map.entry(entry.getKey(), this.getMarkerIcons().stream().map((e) -> Map.entry(e.getId(), e.serialize())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new)));
+        } else	if ("markerSets".equals(entry.getKey())) {
+          return Map.entry(entry.getKey(), this.getMarkerSets().stream().map((e) -> Map.entry(e.getId(), e.serialize())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new)));
+        }
+
+        return entry;
+      }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
     }
   }
 
@@ -264,7 +281,16 @@ public interface Config extends ConfigurationSerializable {
       .allMatch((r) -> r);
   }
 
+  private static <T extends Config> Stream<Map.Entry<String, Object>> _serialize(final T config) {
+    return SavageReflection.read(config).entrySet().stream().filter(Objects::nonNull).filter((e) -> e != null && StringUtils.isNotBlank(e.getKey()) && e.getValue() != null);
+  }
+
   /** {@inheritDoc} */ @Override default Map<String, Object> serialize() {
-    return SavageReflection.read(this);
+    return _serialize(this).map((entry) -> {
+      if (entry.getValue() instanceof Config _value) { return Map.entry(entry.getKey(), _value.serialize()); }
+      if (entry.getValue() instanceof Collection<?> _value && _value.isEmpty()) { return null; }
+
+      return entry;
+    }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
   }
 }

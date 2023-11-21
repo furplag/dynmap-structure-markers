@@ -9,6 +9,7 @@ plugins {
   // Apply the java-library plugin for API and implementation separation.
   `java-library`
   id("com.github.johnrengelman.shadow") version "8.1.1"
+  id("com.diffplug.spotless") version "6.22.0"
 }
 
 repositories {
@@ -25,6 +26,15 @@ dependencies {
   compileOnly("org.projectlombok:lombok:1.18.30")
   annotationProcessor("org.projectlombok:lombok:1.18.30")
   implementation("com.github.furplag:relic:5.1.0")
+}
+
+spotless {
+  java {
+    endWithNewline()
+    indentWithSpaces(2)
+    removeUnusedImports()
+    trimTrailingWhitespace()
+  }
 }
 
 java {
