@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -141,6 +142,10 @@ public interface Config extends ConfigurationSerializable {
       public InputStream getIconImage() {
         return Objects.requireNonNullElse(StringUtils.isBlank(icon) ? getClass().getResourceAsStream("/icons/%s.png".formatted(id)) : Trebuchet.Functions.orNot(Bukkit.getPluginManager().getPlugin(pluginName).getDataFolder().toPath().resolve(icon), Files::newInputStream), StructureMarkersConfig.class.getResourceAsStream("/icons/_default.png".formatted(id)));
       }
+
+      /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
+        return Config.super.serialize().entrySet().stream().filter((e) -> !"id".equals(e.getKey())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
+      }
     }
     private final List<MarkerIconConfig> markerIcons = new ArrayList<>();
 
@@ -218,6 +223,10 @@ public interface Config extends ConfigurationSerializable {
       public boolean isRender(final Structure structure) {
         return structures.isEmpty() || structures.contains(structure.getKey().getKey());
       }
+
+      /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
+        return Config.super.serialize().entrySet().stream().filter((e) -> !"id".equals(e.getKey())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
+      }
     }
     private final List<MarkerSetConfig> markerSets = new ArrayList<>();
 
@@ -246,7 +255,15 @@ public interface Config extends ConfigurationSerializable {
     }
 
     /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
-      return SavageReflection.read(this);
+      return _serialize(this).map((entry) -> {
+        if ("markerIcons".equals(entry.getKey())) {
+          return Map.entry(entry.getKey(), this.getMarkerIcons().stream().map((e) -> Map.entry(e.getId(), e.serialize())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new)));
+        } else	if ("markerSets".equals(entry.getKey())) {
+          return Map.entry(entry.getKey(), this.getMarkerSets().stream().map((e) -> Map.entry(e.getId(), e.serialize())).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new)));
+        }
+
+        return entry;
+      }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
     }
   }
 
@@ -264,7 +281,16 @@ public interface Config extends ConfigurationSerializable {
       .allMatch((r) -> r);
   }
 
+  private static <T extends Config> Stream<Map.Entry<String, Object>> _serialize(final T config) {
+    return SavageReflection.read(config).entrySet().stream().filter(Objects::nonNull).filter((e) -> e != null && StringUtils.isNotBlank(e.getKey()) && e.getValue() != null);
+  }
+
   /** {@inheritDoc} */ @Override default Map<String, Object> serialize() {
-    return SavageReflection.read(this);
+    return _serialize(this).map((entry) -> {
+      if (entry.getValue() instanceof Config _value) { return Map.entry(entry.getKey(), _value.serialize()); }
+      if (entry.getValue() instanceof Collection<?> _value && _value.isEmpty()) { return null; }
+
+      return entry;
+    }).filter(Objects::nonNull).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (_current, _new) -> _new));
   }
 }
