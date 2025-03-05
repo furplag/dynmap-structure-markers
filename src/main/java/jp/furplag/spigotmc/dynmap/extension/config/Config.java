@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +48,7 @@ public interface Config extends ConfigurationSerializable {
 
   static final String pluginName = "dynmap-structure-markers";
 
-  @SerializableAs("jp.furplag.spigotmc.dynmap.extension.config._Config.StructureMarkersConfig")
+  @SerializableAs("jp.furplag.spigotmc.dynmap.extension.config.Config.StructureMarkersConfig")
   @RequiredArgsConstructor
   @Getter
   @EqualsAndHashCode
@@ -78,7 +77,7 @@ public interface Config extends ConfigurationSerializable {
      * world name(s) that allowed marking structures into the map,
      * empty means "All maps accepts to mark structures"
      */
-    private final Set<String> worlds = new HashSet<>();
+    private final List<String> worlds = new ArrayList<>();
 
     /** used to detect the {@link org.dynmap.markers.Marker Marker} this plugin made ( default: "structure-marker" ) */
     private final String markerPrefix;
@@ -194,7 +193,7 @@ public interface Config extends ConfigurationSerializable {
        * <p>keys of Structure ( and also StructureType ) to generate into this map layer .</p>
        * empty means "generate all structure markers into the marker set" .
        */
-      private final Set<String> structures = new HashSet<>();
+      private final List<String> structures = new ArrayList<>();
 
       private static final List<MarkerSetConfig> deserialize(final ConfigurationSection config) {
 

@@ -16,10 +16,12 @@
 ###
 # enabled: true
 # debug-enabled: false
+
 # worlds:
 # - world
 # - world_nether
 # - world_the_end
+
 # marker-prefix: structure-marker
 # marker-icon-prefix: structure-marker
 # marker-set-prefix: structure-marker
@@ -110,12 +112,16 @@ marker-sets:
     - end_city
     - fortress
     - mansion
-    - mineshaft
-    - mineshaft_mesa
     - monument
     - pillager_outpost
     - stronghold
     - trial_chambers
+  mineshaft:
+    hide-by-default: true
+    priority: 14
+    structures:
+    - mineshaft
+    - mineshaft_mesa
   portals:
     priority: 13
     structures:
