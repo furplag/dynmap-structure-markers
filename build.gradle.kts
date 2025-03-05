@@ -5,7 +5,7 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.4/userguide/building_java_projects.html in the Gradle documentation.
  */
 group = "jp.furplag.spigotmc.dynmap.extension"
-version = "1.4.0-SNAPSHOT"
+version = "1.4.0"
 description = "auto generate structure markers into Dynmap ."
 
 val paperSpigotVersion = "1.21.4-R0.1-SNAPSHOT"
