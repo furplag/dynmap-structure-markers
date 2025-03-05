@@ -40,6 +40,8 @@ import lombok.Getter;
  */
 public class StructureMarkers extends JavaPlugin implements Listener {
 
+  private final Set<Location> marked = new HashSet<>();
+
   private StructureMarkersConfig config;
 
   @SuppressWarnings({ "unused" })
@@ -78,9 +80,8 @@ public class StructureMarkers extends JavaPlugin implements Listener {
       if (config.isDebugEnabled()) {
         getLogger().setLevel(java.util.logging.Level.ALL);
         SavageReflection.set(log, "debugEnabled", true);
+        config.serialize().entrySet().stream().forEach((o) -> log.debug("{}", o));
       }
-      config.serialize().entrySet().stream().forEach((o) -> log.debug("{}", o));
-      getConfig().addDefaults(config.serialize());
 
       return Trebuchet.Predicates.orNot(config, (_config) -> _config.isEnabled());
     }, (t, ex) -> {
@@ -145,8 +146,10 @@ public class StructureMarkers extends JavaPlugin implements Listener {
         final Location location = new Location(chunk.getWorld(), chunk.getX() << 4, 64, chunk.getZ() << 4);
         Optional.ofNullable(location.getWorld()).ifPresent((_world) -> Optional.ofNullable(_world.getBiome(location)).ifPresent((_biome) -> {
           Registry.STRUCTURE.stream().map((structure) -> _world.locateNearestStructure(location, structure, 1, false)).filter(Objects::nonNull)
+          .filter((structureSearchResult) -> !marked.contains(structureSearchResult.getLocation()))
           .forEach((structureSearchResult) -> {
             final Location resultLocation = structureSearchResult.getLocation();
+            marked.add(resultLocation);
             final MarkerIconConfig icon = config.getMarkerIcon(structureSearchResult.getStructure().getKey().getKey());
             config.getMarkerSets().stream().filter((layer) -> layer.isRender(structureSearchResult.getStructure())).forEach((markerSetConfig) -> {
               final Set<String> unavailableIcons = new HashSet<>();
