@@ -138,6 +138,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
     });
   }
 
+  @SuppressWarnings({ "deprecation" }) /** compatibility issue on PaperMC <-> SpigotMC */
   private void registerMarker(final ChunkLoadEvent event) {
     Trebuchet.Consumers.orNot(event, (_event) -> {
       Optional.ofNullable(Bukkit.getPluginManager().isPluginEnabled("dynmap") ? Bukkit.getPluginManager().getPlugin("dynmap") : null).ifPresent((plugin) -> {
@@ -150,7 +151,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
           .forEach((structureSearchResult) -> {
             final Location resultLocation = structureSearchResult.getLocation();
             marked.add(resultLocation);
-            final MarkerIconConfig icon = config.getMarkerIcon(structureSearchResult.getStructure().getKeyOrThrow().getKey());
+            final MarkerIconConfig icon = config.getMarkerIcon(Trebuchet.Functions.orNot(structureSearchResult.getStructure(), (structure) -> structure.getKey().getKey()));
             config.getMarkerSets().stream().filter((layer) -> layer.isRender(structureSearchResult.getStructure())).forEach((markerSetConfig) -> {
               final Set<String> unavailableIcons = new HashSet<>();
               final Set<String> unavailableLayers = new HashSet<>();

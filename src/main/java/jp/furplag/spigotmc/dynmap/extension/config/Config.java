@@ -120,7 +120,9 @@ public interface Config extends ConfigurationSerializable {
 
       @SuppressWarnings({ "deprecation" }) /** compatibility issue on PaperMC <-> SpigotMC */
       private static final List<MarkerIconConfig> deserialize(final ConfigurationSection config) {
-        return Stream.concat(Stream.of(_defaults), Registry.STRUCTURE.stream().flatMap((structure) -> Stream.of(structure.getKey().getKey(), structure.getStructureType().getKey().getKey())).map((id) -> id.split(":")).map((ids) -> ids[ids.length - 1])
+        return Stream.concat(Stream.of(_defaults), Registry.STRUCTURE.stream()
+        	.flatMap((structure) -> Stream.of(Trebuchet.Functions.orNot(structure, (_structure) -> _structure.getKey().getKey()), Trebuchet.Functions.orNot(structure.getStructureType(), (structureType) -> structureType.getKey().getKey())))
+        	.filter(Objects::nonNull).map((id) -> id.split(":")).map((ids) -> ids[ids.length - 1])
           .distinct().map((id) -> deserialize(id, config.getConfigurationSection("marker-icons.%s".formatted(id)))).filter(Objects::nonNull)
         ).sorted(Comparator.comparing(MarkerIconConfig::getId)).collect(Collectors.toUnmodifiableList());
       }
