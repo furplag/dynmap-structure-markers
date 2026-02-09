@@ -5,14 +5,16 @@
  * For more details on building Java & JVM projects, please refer to https://docs.gradle.org/8.4/userguide/building_java_projects.html in the Gradle documentation.
  */
 group = "jp.furplag.spigotmc.dynmap.extension"
-version = "1.4.0"
+version = "1.5.0-SNAPSHOT"
 description = "auto generate structure markers into Dynmap ."
 
-val paperSpigotVersion = "1.21.4-R0.1-SNAPSHOT"
+val paperSpigotVersion = "1.21.11-R0.2-SNAPSHOT"
+val lombokVersion = "1.18.42"
+
 plugins {
   // Apply the java-library plugin for API and implementation separation.
   `java-library`
-  id("com.diffplug.spotless") version "7.0.2"
+  id("com.diffplug.spotless") version "8.2.1"
   id("com.gradleup.shadow") version "8.3.0"  
 }
 repositories {
@@ -24,12 +26,12 @@ repositories {
 
 dependencies {
   compileOnly("org.spigotmc:spigot-api:${paperSpigotVersion}")
-  compileOnly("us.dynmap:DynmapCoreAPI:3.7-beta-6")
+  compileOnly("us.dynmap:DynmapCoreAPI:3.8")
 
-  compileOnly("org.projectlombok:lombok:1.18.36")
-  annotationProcessor("org.projectlombok:lombok:1.18.36")
+  compileOnly("org.projectlombok:lombok:${lombokVersion}")
+  annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
-  implementation("com.github.furplag:relic:5.1.0")
+  implementation("com.github.furplag:relic:v5.2.1")
 }
 
 spotless {

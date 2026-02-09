@@ -16,8 +16,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,6 +25,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.SerializableAs;
 import org.bukkit.generator.structure.Structure;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.common.base.CaseFormat;
 
@@ -102,7 +101,7 @@ public interface Config extends ConfigurationSerializable {
       private static final MarkerIconConfig _defaults = new MarkerIconConfig("_unresolved", "Unknown Structure", null);
 
       /** identity of {@link org.dynmap.markers.MarkerIcon MarkerIcon} */
-      private final @Nonnull String id;
+      private final @NotNull String id;
 
       /**
        * <p>the name use to display marker into the map .</p>
@@ -119,8 +118,11 @@ public interface Config extends ConfigurationSerializable {
        */
       private final String icon;
 
+      @SuppressWarnings({ "deprecation" }) // compatibility issue on PaperMC <-> SpigotMC
       private static final List<MarkerIconConfig> deserialize(final ConfigurationSection config) {
-        return Stream.concat(Stream.of(_defaults), Registry.STRUCTURE.stream().flatMap((structure) -> Stream.of(structure.getKey().getKey(), structure.getStructureType().getKey().getKey())).map((id) -> id.split(":")).map((ids) -> ids[ids.length - 1])
+        return Stream.concat(Stream.of(_defaults), Registry.STRUCTURE.stream()
+        	.flatMap((structure) -> Stream.of(Trebuchet.Functions.orNot(structure, (_structure) -> _structure.getKey().getKey()), Trebuchet.Functions.orNot(structure.getStructureType(), (structureType) -> structureType.getKey().getKey())))
+        	.filter(Objects::nonNull).map((id) -> id.split(":")).map((ids) -> ids[ids.length - 1])
           .distinct().map((id) -> deserialize(id, config.getConfigurationSection("marker-icons.%s".formatted(id)))).filter(Objects::nonNull)
         ).sorted(Comparator.comparing(MarkerIconConfig::getId)).collect(Collectors.toUnmodifiableList());
       }
@@ -160,7 +162,7 @@ public interface Config extends ConfigurationSerializable {
     public static class MarkerSetConfig implements Config {
 
       /** identity of {@link org.dynmap.markers.MarkerSet MarkerSet} */
-      private final @Nonnull String id;
+      private final @NotNull String id;
 
       /**
        * <p>the name use to display marker layer toggles .</p>
@@ -219,8 +221,9 @@ public interface Config extends ConfigurationSerializable {
         return "%s%s".formatted(Trebuchet.Functions.orElse(icon, MarkerIconConfig::getLabel, () -> label), labelWithCoordinates ? " [ %d, %d ]".formatted(location.getBlockX(), location.getBlockZ()) : "");
       }
 
+      @SuppressWarnings({ "deprecation" }) // compatibility issue on PaperMC <-> SpigotMC
       public boolean isRender(final Structure structure) {
-        return structures.isEmpty() || structures.contains(structure.getKey().getKey());
+        return structures.isEmpty() || Trebuchet.Predicates.orElse(structure, (_structure) -> structures.contains((_structure.getKey()).getKey()), (t, ex) -> true);
       }
 
       /** {@inheritDoc} */ @Override public Map<String, Object> serialize() {
