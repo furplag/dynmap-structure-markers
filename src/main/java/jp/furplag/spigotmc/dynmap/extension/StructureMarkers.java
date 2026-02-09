@@ -128,7 +128,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
         markerSet.setHideByDefault(markerSetConfig.isHideByDefault());
         markerSet.setLayerPriority(markerSetConfig.getPriority());
         markerSet.setMinZoom(markerSetConfig.getMinZoom());
-        markerSet.setMinZoom(markerSetConfig.getMaxZoom());
+        markerSet.setMaxZoom(markerSetConfig.getMaxZoom());
         markerSet.setLabelShow(markerSetConfig.isLabelShow());
         Optional.ofNullable(Optional.ofNullable(markerAPI.getMarkerIcon(markerSetConfig.getIcon())).orElse(markerAPI.getMarkerIcon(config.getMarkerIconId(config.getMarkerIcon(markerSetConfig.getIcon())))))
           .ifPresent(markerSet::setDefaultMarkerIcon);
@@ -150,7 +150,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
           .forEach((structureSearchResult) -> {
             final Location resultLocation = structureSearchResult.getLocation();
             marked.add(resultLocation);
-            final MarkerIconConfig icon = config.getMarkerIcon(structureSearchResult.getStructure().getKey().getKey());
+            final MarkerIconConfig icon = config.getMarkerIcon(structureSearchResult.getStructure().getKeyOrThrow().getKey());
             config.getMarkerSets().stream().filter((layer) -> layer.isRender(structureSearchResult.getStructure())).forEach((markerSetConfig) -> {
               final Set<String> unavailableIcons = new HashSet<>();
               final Set<String> unavailableLayers = new HashSet<>();
