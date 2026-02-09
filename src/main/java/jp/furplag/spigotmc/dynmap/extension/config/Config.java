@@ -118,7 +118,7 @@ public interface Config extends ConfigurationSerializable {
        */
       private final String icon;
 
-      @SuppressWarnings({ "deprecation" }) /** compatibility issue on PaperMC <-> SpigotMC */
+      @SuppressWarnings({ "deprecation" }) // compatibility issue on PaperMC <-> SpigotMC
       private static final List<MarkerIconConfig> deserialize(final ConfigurationSection config) {
         return Stream.concat(Stream.of(_defaults), Registry.STRUCTURE.stream()
         	.flatMap((structure) -> Stream.of(Trebuchet.Functions.orNot(structure, (_structure) -> _structure.getKey().getKey()), Trebuchet.Functions.orNot(structure.getStructureType(), (structureType) -> structureType.getKey().getKey())))
@@ -221,7 +221,7 @@ public interface Config extends ConfigurationSerializable {
         return "%s%s".formatted(Trebuchet.Functions.orElse(icon, MarkerIconConfig::getLabel, () -> label), labelWithCoordinates ? " [ %d, %d ]".formatted(location.getBlockX(), location.getBlockZ()) : "");
       }
 
-      @SuppressWarnings({ "deprecation" }) /** compatibility issue on PaperMC <-> SpigotMC */
+      @SuppressWarnings({ "deprecation" }) // compatibility issue on PaperMC <-> SpigotMC
       public boolean isRender(final Structure structure) {
         return structures.isEmpty() || Trebuchet.Predicates.orElse(structure, (_structure) -> structures.contains((_structure.getKey()).getKey()), (t, ex) -> true);
       }

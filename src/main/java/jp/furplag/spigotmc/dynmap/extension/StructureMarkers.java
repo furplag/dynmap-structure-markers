@@ -138,7 +138,7 @@ public class StructureMarkers extends JavaPlugin implements Listener {
     });
   }
 
-  @SuppressWarnings({ "deprecation" }) /** compatibility issue on PaperMC <-> SpigotMC */
+  @SuppressWarnings({ "deprecation" }) // compatibility issue on PaperMC <-> SpigotMC
   private void registerMarker(final ChunkLoadEvent event) {
     Trebuchet.Consumers.orNot(event, (_event) -> {
       Optional.ofNullable(Bukkit.getPluginManager().isPluginEnabled("dynmap") ? Bukkit.getPluginManager().getPlugin("dynmap") : null).ifPresent((plugin) -> {
